@@ -10,6 +10,14 @@ local Watcher = require("neogit.watcher")
 local git = require("neogit.lib.git")
 local a = require("plenary.async")
 
+local function remove_trailing_blankline(lines)
+  if lines[#lines] == "" then
+    lines[#lines] = nil
+  end
+
+  return lines
+end
+
 local function get_local_diff_view(section_name, item_name, opts)
   local left = Rev(RevType.STAGE)
   local right = Rev(RevType.LOCAL)
@@ -84,9 +92,9 @@ local function get_local_diff_view(section_name, item_name, opts)
           table.insert(args, "HEAD")
         end
 
-        return git.cli.show.file(unpack(args)).call({ await = true, trim = false }).stdout
+        return remove_trailing_blankline(git.cli.show.file(unpack(args)).call({ await = true, trim = false }).stdout)
       elseif kind == "working" then
-        local fdata = git.cli.show.file(path).call({ await = true, trim = false }).stdout
+        local fdata = remove_trailing_blankline(git.cli.show.file(path).call({ await = true, trim = false }).stdout)
         return side == "left" and fdata
       end
     end,

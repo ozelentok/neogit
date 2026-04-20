@@ -147,8 +147,13 @@ function M.open(section_name, item_name, opts)
     view = dv_lib.diffview_open(dv_utils.tbl_pack("--selected-file=" .. item_name))
   elseif (section_name == "conflict" or section_name == "worktree") and not item_name then
     view = dv_lib.diffview_open()
+  elseif section_name == "staged" or section_name == "unstaged" then
+    local view_args = dv_utils.tbl_pack("--" .. section_name, "-u=no")
+    if item_name then
+      table.insert(view_args, "--selected-file=" .. item_name)
+    end
+    view = dv_lib.diffview_open(view_args)
   elseif section_name ~= nil then
-    -- for staged, unstaged, merge
     view = get_local_diff_view(section_name, item_name, opts)
   elseif section_name == nil and item_name ~= nil then
     view = dv_lib.diffview_open(dv_utils.tbl_pack(item_name .. "^!"))
